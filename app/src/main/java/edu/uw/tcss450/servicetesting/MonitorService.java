@@ -3,10 +3,12 @@ package edu.uw.tcss450.servicetesting;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
@@ -29,6 +31,12 @@ public class MonitorService extends IntentService {
             mBuilder.setSmallIcon(R.drawable.ic_ethernet_black);
             mBuilder.setContentTitle("HR/SpO2 Monitor");
             mBuilder.setContentText("Device communication service is running.");
+            mBuilder.setContentIntent(
+                    PendingIntent.getActivity(
+                            getApplicationContext(),
+                            0,
+                            new Intent(this, MainActivity.class),
+                            PendingIntent.FLAG_UPDATE_CURRENT));
 
             this.startForeground(NOTIFY_GEN_SERVICE, mBuilder.build());
             connectToDeviceMAC(mac);
