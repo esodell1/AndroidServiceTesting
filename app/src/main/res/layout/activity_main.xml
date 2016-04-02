@@ -10,17 +10,35 @@
     tools:context="edu.uw.tcss450.servicetesting.MainActivity"
     android:orientation="vertical">
 
-    <Button
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Service"
-        android:id="@+id/button_start"
-        android:onClick="clickStart" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp">
 
-    <Button
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Start Service"
+            android:id="@+id/button_start"
+            android:onClick="clickStart"
+            android:layout_weight="1" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Stop Service"
+            android:id="@+id/button_stop"
+            android:onClick="clickStop"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Stop Service"
-        android:id="@+id/button_stop"
-        android:onClick="clickStop" />
+        android:id="@+id/editMAC"
+        android:layout_gravity="center_horizontal"
+        android:hint="MAC Address" />
+
 </LinearLayout>

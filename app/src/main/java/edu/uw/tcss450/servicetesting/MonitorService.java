@@ -1,16 +1,19 @@
 package edu.uw.tcss450.servicetesting;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p/>
- */
+
 public class MonitorService extends IntentService {
+    private static final String LOG_TAG = "MonitorService";
+    private static final int NOTIFY_GEN_SERVICE = 1;
 
     public MonitorService() {
         super("MonitorService");
@@ -19,43 +22,55 @@ public class MonitorService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
-            final String param1 = intent.getStringExtra(MainActivity.MAC_ADDR_PARAM);
-            handleActionBaz(param1);
+            final String mac = intent.getStringExtra(MainActivity.MAC_ADDR_PARAM);
+
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+            mBuilder.setDefaults(Notification.DEFAULT_ALL);
+            mBuilder.setSmallIcon(R.drawable.ic_ethernet_black);
+            mBuilder.setContentTitle("HR/SpO2 Monitor");
+            mBuilder.setContentText("Device communication service is running.");
+
+            this.startForeground(NOTIFY_GEN_SERVICE, mBuilder.build());
+            connectToDeviceMAC(mac);
         }
     }
 
-    /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionFoo(String param1) {
-        // TODO: Handle action Foo
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+    private int connectToDeviceMAC(String macAddr) {
 
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionBaz(String param1) {
-        // TODO: Handle action Baz
-        //throw new UnsupportedOperationException("Not yet implemented");
-        Log.v("serviceResponse", "Running BAZ function...");
-        Log.v("serviceResponse", "Connecting to device " + param1 + "...");
+        // Verify the Android device is connected to WiFi
+        Log.v(LOG_TAG, "Verifying WiFi connection...");
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-        while(true) {
+        if (!mWifi.isConnected()) {
+            Log.e(LOG_TAG, "WiFi connection not detected. Aborting service...");
+            stopSelf();
+        } else {
+            Log.v(LOG_TAG, "WiFi found.");
+        }
+
+
+        // Connect to MAC address
+        Log.v(LOG_TAG, "Connecting to device " + macAddr + "...");
+
+
+
+        for(int i = 0; i < 3; i++) {
+            // Service stays alive when there is work, otherwise it will terminate.
             try {
                 Thread.sleep(5000);
+                Log.v(LOG_TAG, "Doing some more work...");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
+        return 0;
     }
 
     @Override
     public void onDestroy() {
-        Log.v("serviceResponse", "Stopping service thread.");
+        Log.v(LOG_TAG, "Stopping service thread.");
         super.onDestroy();
     }
 }
